@@ -10,6 +10,7 @@ def home():
     return render_template('index.html')
 
 @site.route('/profile')
+@login_required
 def profile():
     return render_template('profile.html')
 
@@ -63,7 +64,7 @@ def update_car(id):
     return render_template('update.html', car=car)
     
 
-@site.route('/<int:id>/delete_car', methods=['POST, GET'])
+@site.route('/<int:id>/delete_car', methods=['POST', 'GET'])
 @login_required
 def delete_car(id):
     user_id = current_user.id
