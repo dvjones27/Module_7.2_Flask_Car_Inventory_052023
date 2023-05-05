@@ -78,9 +78,9 @@
                             <button type="submit" class="fas fa-2xs btn btn-warning text-dark update-button" name="update">Edit</button>
                         </form> -->
                         
-                        <form method="POST" action="{{ url_for('site.delete_car', id=car.vin) }}"  style="justify-content: center; float: right" >
+                        <form method="POST" action="/{{ car.vin }}/delete_car"  style="justify-content: center; float: right" >
                             <input type="hidden" name="method" value="Delete">
-                            <button type="submit"  action="{{ url_for('site.delete_car', id=car.vin) }}" class="fas fa-2xs btn btn-danger text-dark delete-button" name="delete">Delete</button>
+                            <button type="submit"  class="fas fa-2xs btn btn-danger text-dark delete-button" name="delete">Delete</button>
                         </form>
                     </td>
                 </tr>

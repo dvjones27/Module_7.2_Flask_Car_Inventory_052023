@@ -19,11 +19,6 @@ def cars():
     cars = Car.query.all()
     return render_template('cars.html', cars=cars)
 
-# @site.route('/update')
-# @login_required
-# def update():
-#     return render_template('update.html')
-
 @site.route('/create_car', methods=['POST'])
 @login_required
 def create_car():
@@ -34,7 +29,7 @@ def create_car():
     color = request.form['color']
     user_id = current_user.id
     
-    car = Car(vin = vin, year=year, make=make, model=model, color=color, user_id = user_id )
+    car = Car(vin, year, make, model, color, user_id = user_id )
     db.session.add(car)
     db.session.commit()
     
@@ -68,14 +63,18 @@ def update_car(id):
     return render_template('update.html', car=car)
     
 
-@site.route('/delete_car/<id>', methods=['POST, GET'])
+@site.route('/<int:id>/delete_car', methods=['POST, GET'])
 @login_required
 def delete_car(id):
-    car = Car.query.get(id)
-    if car:
-        db.session.delete(car)
-        db.session.commit()
-        return redirect(url_for('site.cars'))
+    user_id = current_user.id
+    cars = Car.query.filter_by(user_id =user_id).first()
+    if request.method == 'POST':
+        
+        if cars:
+            db.session.delete(cars)
+            db.session.commit()
+            return redirect(url_for('site.cars'))
+        abort(404)
     
     
     return redirect(url_for('site.cars'))
