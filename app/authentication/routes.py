@@ -1,4 +1,4 @@
-from forms import UserSignUpForm, UserSigninForm
+from forms import UserSignUpForm, UserSignInForm
 from models import User, db, check_password_hash
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 
@@ -14,13 +14,14 @@ def signup():
 
     try:
         if request.method == 'POST' and form.validate_on_submit():
+            email = form.email.data
             first_name = form.first_name.data
             last_name = form.last_name.data
-            email = form.email.data
+            username = form.username.data
             password = form.password.data
-            print(email, first_name, last_name, password)
+            
 
-            user = User(email, first_name, last_name, password = password)
+            user = User(email, first_name, last_name, username, password = password)
 
             db.session.add(user)
             db.session.commit()
@@ -37,15 +38,16 @@ def signup():
 
 @auth.route('/signin', methods = ['GET', 'POST'])
 def signin():
-    form = UserSigninForm()
+    form = UserSignInForm()
     
     try:
         if request.method == 'POST' and form.validate_on_submit():
-            email = form.email.data
+            # email = form.email.data
+            username = form.username.data
             password = form.password.data
-            print(email, password)
+            print(username, password)
 
-            logged_user = User.query.filter(User.email == email).first()
+            logged_user = User.query.filter(User.username == username).first()
             if logged_user and check_password_hash(logged_user.password, password):
                 login_user(logged_user)
                 flash('You were successful in your login. Congratulations, and welcome to the Car Inquiries Page.', 'auth-success')

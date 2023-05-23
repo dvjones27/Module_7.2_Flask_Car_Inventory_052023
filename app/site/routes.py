@@ -28,51 +28,53 @@ def create_car():
     make = request.form['make']
     model = request.form['model']
     color = request.form['color']
-    user_id = current_user.id
+    user_token = current_user.token
     
-    car = Car(vin, year, make, model, color, user_id = user_id )
+    car = Car(vin=vin, year=year, make=make, model=model, color=color, user_token = user_token )
     db.session.add(car)
     db.session.commit()
     
     return redirect(url_for('site.cars'))
 
 
-@site.route('/update_car/<id>', methods=['POST', 'PUT'])
+@site.route('/update_car/<string:vin>', methods=['POST', 'GET'])
 @login_required
-def update_car(id):
-    # car = Car.query.get(id)
-    vin = Car.query.filter_by(id=id).first()
-    # form=update_car
+def update_car(vin):
+    car = Car.query.get(vin)
+    car = Car.query.filter_by(vin=vin).first()
     if request.method == 'POST':
-        print("I printed!")
-        if vin:
-        
+        # db.session.delete(car)
+        # db.session.commit()
+        if car:
+    
             vin = request.form['vin']
             year = request.form['year']
             make = request.form['make']
             model = request.form['model']
             color = request.form['color']
+            user_token = current_user.token
             
-            car = Car(vin ='',  year ='', make='', model='', color='')
-            
-            db.session.update(car)
+            car = Car( vin = vin, year = year, make = make, model = model, color = color, user_token = user_token)
+
+    
+            db.session.add(car)
             db.session.commit()
-            return  redirect(url_for('/site.cars'))
-        return f"Car does not exist."
+            return  redirect(url_for('site.cars'))
+        return f"Vin {vin} is not valid."
+    return render_template('update.html', car=car)
         
     
-    return render_template('update.html', car=car)
+    # return redirect(url_for('site.cars'))
     
 
-@site.route('/<int:id>/delete_car', methods=['POST', 'GET'])
+@site.route('/delete_car/<id>', methods=['POST', 'GET', 'PUT'])
 @login_required
 def delete_car(id):
-    user_id = current_user.id
-    cars = Car.query.filter_by(user_id =user_id).first()
+    car = Car.query.get(id)
     if request.method == 'POST':
         
         if cars:
-            db.session.delete(cars)
+            db.session.delete(car)
             db.session.commit()
             return redirect(url_for('site.cars'))
         abort(404)

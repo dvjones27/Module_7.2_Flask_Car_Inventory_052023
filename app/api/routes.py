@@ -16,10 +16,10 @@ def create(current_user_token):
     model = request.json['model']
     year = request.json['year']
     color = request.json['color']
-    user_id = User.query.get(current_user_token.id)
+    user_token = current_user_token.token
     
     
-    car = Car(vin, year, make, model, color, user_id = user_id)
+    car = Car(vin, make, model,  year, color, user_token = user_token)
 
     db.session.add(car)
     db.session.commit()
@@ -31,16 +31,8 @@ def create(current_user_token):
 
 @api.route('/cars', methods = ['GET'])
 @token_required
-def get_cars(current_user_token):
-    user_id = current_user_token.id
-    cars = Car.query.filter_by(user_id = user_id).all()
-    response = cars_schema.dump(cars)
-    return jsonify(response)
-
-
-@api.route('/cars/<id>', methods = ['GET'])
-@token_required
-def get_single_car(current_user_token, id):
+def get_cars(current_user_token, id):
+    user_token = current_user_token.token
     car_Token = current_user_token.token
     if car_Token == current_user_token.token:
         car = Car.query.get(id)
@@ -50,17 +42,33 @@ def get_single_car(current_user_token, id):
         return jsonify({'message': "Invalid Token"}), 401
 
 
+
+@api.route('/cars/<id>', methods = ['GET'])
+@token_required
+def get_single_car(current_user_token, id):
+    car_Token = current_user_token.token
+    cars = Car.query.filter_by(user_token = car_Token).all()
+    response = cars_schema.dump(cars)
+    return jsonify(response)
+
 @api.route('/cars/<id>', methods = ['POST','PUT'])
 @token_required
 def update(current_user_token, id):
     car = Car.query.get(id) 
-    car.vin = request.json['vin']
-    car.make = request.json['make']
-    car.model = request.json['model']
-    car.year = request.json['year']
-    car.color = request.json['color']
-    car.user_id = current_user_token.id
-
+    vin = request.json['vin']
+    make = request.json['make']
+    model = request.json['model']
+    year = request.json['year']
+    color = request.json['color']
+    user_token = current_user_token.token
+    
+    car.vin = vin
+    car.make = make
+    car.model = model
+    car.year = year
+    car.color = color
+    car.user_token = current_user_token.token
+    
     db.session.commit()
     response = car_schema.dump(car)
     return jsonify(response)
@@ -73,5 +81,20 @@ def delete(current_user_token, id):
     db.session.commit()
     response = car_schema.dump(car)
     return jsonify(response)
+
+
+    # user_token = current_user_token.token
+    # car = Car.query.get(id)
+    # if request.method == 'POST':
+        
+    #     if cars:
+    #         db.session.delete(car)
+    #         db.session.commit()
+    #         return redirect(url_for('site.cars'))
+    #     abort(404)
+    
+    
+    # return redirect(url_for('site.cars'))
+
 
 
